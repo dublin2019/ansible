@@ -1,0 +1,30 @@
+---
+# tasks file for create.unix.users
+
+- name: Create local unix accounts
+  user: 
+    name: '{{ item.key }}'
+    comment: '{{ item.value.comment }}'
+    groups: admin
+    append: yes
+    createhome: yes
+    state: present
+  with_dict: "{{ dublin_users }}"
+
+- name: setup ssh pubkeys for users
+  authorized_key:
+    user: '{{ item.key }}'
+    key: "{{ item.value.pubkey }}"
+  with_dict: "{{ dublin_users }}"
+
+- name: template an sudoers file into place
+  template:
+    src: sudoers.j2
+    dest: /etc/sudoers.d/{{ item.key }}
+    owner: root
+    group: root
+    mode: 0440
+    validate: 'visudo -cf %s'
+  with_dict: "{{ dublin_users }}"
+ 
+

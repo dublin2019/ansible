@@ -1,0 +1,35 @@
+# How do we solve a problem like server configuration?
+# with a spot of ansible
+# swkj
+---
+
+- name: Create user accounts on a host
+  hosts: dublin2019-b
+  become: true
+
+  roles:
+#  - create.unix.users
+#  - install.fail2ban
+  - install.docker
+
+# things to do...
+# check DNS resolution (seems to be set by something else?) - leaving for now, being set elsewhere
+# ntpd config - leaving for now, left as default ubuntu pool servers
+# 
+# local users with ssh keys (done? needs testing and defining non-root users?)
+# sudoers config (done, needs testing)
+# hosts file?
+# config lang/locale?
+# apt repos?
+# postfix or smtpd handling?
+# monitoring client?
+# logshipping and rotation
+# clamav
+# docker
+# What we need ATM on the new server: membership system (docker-compose + git mainly). Main website (to dockerise if possible : apache + php + mysql). 
+# We might want to front all this with a reverse proxy. I did try to use Varnish at some point (and it could be used as a RP if we add SSL termination before), 
+# but the config to manage wordpress got too complex. I guess the main options for a RP are HAProxy and Nginx. I'm quite used to Nginx, but have used HAProxy some time ago. 
+# Both would do the job nicely.
+# Note: we have some important (and secret) information in the membership docker-compose files. We can't have that file on a public GIT server.
+# Other components to have are mainly filebeat/packetbeat/metricbeat, but that's the easy part
+  

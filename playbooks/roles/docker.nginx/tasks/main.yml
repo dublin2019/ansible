@@ -1,0 +1,47 @@
+---
+# tasks file for docker.nginx
+
+# first few tasks are going to be making some directories to put things in.
+
+- name: Create basic config directories
+  file:
+    path: /etc/nginx-proxy/{{ item }}
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+  - conf.d
+  - certs
+
+- name: generate dhparam file
+  command: /usr/bin/openssl dhparam -out /etc/nginx-proxy/ssl/dhparam.pem 2048
+  args:
+    creates: /etc/nginx-proxy/ssl/dhparam.pem
+  notify:
+  - restart_nginx
+
+- name: Put a base config file into place.
+  copy:
+    src: files/nginx.conf
+    dest: /etc/nginx-proxy/nginx.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Template in based on the docker dictionary
+  template:
+    src: templates/proxy-site.conf.j2
+    dest: /etc/nginx-proxy/conf.d/{{ item.key }}.conf
+    owner: root
+    group: root
+    mode: 0644
+  with_dict: "{{ docker_sites }}"
+
+- name: Copy in the worldcon.ie file which is nothing but redirects
+  copy:
+    src: files/worldcon.ie.conf
+    dest: /etc/nginx-proxy/conf.d/worldcon.ie.conf
+    owner: root
+    group: root
+    mode: 0644

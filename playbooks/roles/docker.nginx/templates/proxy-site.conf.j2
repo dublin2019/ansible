@@ -1,0 +1,18 @@
+server {
+                        listen 80;
+                        server_name {{ item.value.http_server_name }};
+			return 301 https://$host$request_uri;
+}
+server {
+			listen 443 ssl;
+                        server_name {{ item.value.http_server_name }};
+                        ssl_certificate  /etc/nginx/ssl/{{ ssl_certificate_name }}.crt;
+                        ssl_certificate_key  /etc/nginx/ssl/{{ ssl_certicate_name }}.key;
+                        location / {
+                                  	proxy_pass http://localhost:{{ docker_port }};
+					add_header Content-Security-Policy-Report-Only "default-src 'self';script-src 'self';connect-src 'self';img-src 'self';style-src 'self';font-src 'self'";
+					add_header Strict-Transport-Security "max-age=300" always;
+					add_header X-Content-Type-Options nosniff;
+					add_header X-XSS-Protection "1; mode=block" always;
+                                   }
+}
