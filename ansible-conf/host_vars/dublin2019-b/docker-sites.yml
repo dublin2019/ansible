@@ -2,32 +2,32 @@
 
 docker_sites;
   dublin2019.com:
-    http_server_name: "dublin2019.com www.dublin2019.com www3.dublin2019.com"
+    http_server_name: "dublin2019.com www.dublin2019.com www3.dublin2019.com default_server"
     ssl_certificate_name: foo
-    docker_port: 8080
+    docker_url: http://localhost:8080
   posdtfixadmin:
     http_server_name: "postfixadmin.dublin2019.com"
     ssl_certificate_name: bar
-    docker_port: 8081
+    docker_url: http://localhost:8081
   roundcube:
     http_server_name: "webmail.dublin2019.com webmail2.dublin2019.com"
     ssl_certificate_name: baz
-    docker_port: 8082
+    docker_url: http://localhost:8082
   thirzah:
     http_server_name: "webad.dublin2019.com"
     ssl_certificate_name: quux
-    docker_port: 8083
+    docker_url: http://localhost:8083
   mailman:
     http_server_name: "lists.dublin2019.com"
     ssl_certificate_name: wibble
-    docker_port: 8084
+    docker_url: http://localhost:8084
   wiki:
     http_server_name: "wiki.dublin2019.com"
     ssl_certificate_name: bibble
-    docker_port: 8085
+    docker_url: http://localhost:8085
   api:
     http_server_name: "api.dublin2019.com"
     ssl_certificate_name: dibble
-    docker_port: 8086
+    docker_url: http://localhost:8086
   
 
