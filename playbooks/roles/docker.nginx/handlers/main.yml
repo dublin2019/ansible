@@ -1,2 +1,43 @@
 ---
 # handlers file for docker.nginx
+- name: stop_nginx_container
+  docker_container:
+    image: "nginx:1.14.0"
+    name: nginx-proxy
+    volumes:
+    - "/etc/nginx-proxy:/etc/nginx:ro"
+    - "{{ nginx_base_directory }}/defaults:/usr/share/nginx/html:ro"
+    - "/etc/lets-encrypt/:etc/nginx/ssl:ro" 
+    ports:
+    - '80:80'
+    - '443:443'
+    exposed_ports:
+    - '80'
+    - '443'
+    state: stopped
+    restart_policy: always
+    log_driver: syslog
+    log_options:
+      tag: nginx-proxy
+  listen: restart_nginx_container
+
+- name: start_nginx_container
+  docker_container:
+    image: "nginx:1.14.0"
+    name: nginx-proxy
+    volumes:
+    - "/etc/nginx-proxy:/etc/nginx:ro"
+    - "{{ nginx_base_directory }}/defaults:/usr/share/nginx/html:ro"
+    - "/etc/lets-encrypt/:etc/nginx/ssl:ro"
+    ports:
+    - '80:80'
+    - '443:443'
+    exposed_ports:
+    - '80'
+    - '443'
+    state: started
+    restart_policy: always
+    log_driver: syslog
+    log_options:
+      tag: nginx-proxy
+  listen: restart_nginx_container 

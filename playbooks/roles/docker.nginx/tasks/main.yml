@@ -19,7 +19,7 @@
   args:
     creates: /etc/nginx-proxy/ssl/dhparam.pem
   notify:
-  - restart_nginx
+  - restart_nginx_container
 
 - name: Put a base config file into place.
   copy:
@@ -28,6 +28,7 @@
     owner: root
     group: root
     mode: 0644
+  - restart_nginx_container
 
 - name: Template in based on the docker dictionary
   template:
@@ -37,6 +38,7 @@
     group: root
     mode: 0644
   with_dict: "{{ docker_sites }}"
+  - restart_nginx_container
 
 - name: Copy in the worldcon.ie file which is nothing but redirects
   copy:
@@ -45,6 +47,7 @@
     owner: root
     group: root
     mode: 0644
+  - restart_nginx_container
 
 # What are we doing with the SSL certificates here.
 # 
