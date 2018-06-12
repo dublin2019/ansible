@@ -1,0 +1,81 @@
+--
+# tasks file for docker.websites
+
+# make /home/websites
+# copy in the various structures
+# read secret variables in
+# template in files with secrets
+# copy in docker.compose file
+# execute!
+
+- name: create /home/websites and subdirectories.
+  file: 
+    dest: /home/websites/{{ item }}
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+  with_items:
+  - nginx-router
+  - mysql-wp
+  - mysql-wiki
+  - php-wp
+  - php-wiki
+
+- name: copy nginx-router files into the directory
+  copy:
+    src: files/nginx-router/{{ item }}
+    dest: /home/websites/nginx-router/{{ item }}
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+  - nginx.conf
+  - www.dublin2019.com.key.pem
+  - www.dublin2019.com.cert.pem
+
+- name: copy my.cnf file to each of the mysql db areas
+  copy:
+    src: files/my.cnf
+    dest: /home/website/{{ item }}/my.cnf
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+  - mysql-wp
+  - mysql-wiki
+
+- name: copy Dockerfile and vhosts file to respective php-wiki container folders
+  copy:
+    src: files/php-wiki/{{ item }}
+    dest: /home/websites/php-wiki/{{ item }}
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+  - Dockerfile
+  - wiki-vhost.conf
+
+- name: copy Dockerfile and vhosts file to respective php-wp container folders
+  copy:
+    src: files/php-wp/{{ item }}
+    dest: /home/websites/php-wp/{{ item }}
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+  - Dockerfile
+  - wp-vhost.conf
+
+- name: Read in Dockerfile Secrets
+  include_vars:
+    file: websites.yml
+
+- name: template in the dockerfile-compose.yml
+  template:
+    src: templates/docker-compose.yml.j2
+    dest: /home/websites/docker-compose.yml
+    owner: root
+    group: root
+    mode: 0644
+

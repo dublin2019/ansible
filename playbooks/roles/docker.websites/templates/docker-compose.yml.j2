@@ -1,0 +1,92 @@
+version: '2'
+
+volumes:
+  wiki-html-volume:
+    external: true
+  wiki-mysql-volume:
+    external: true
+  wp-html-volume:
+    external: true
+  wp-mysql-volume:
+    external: true
+
+networks:
+  wiki-network:
+  wp-network:
+  http-network:
+
+services:
+  nginx-router:
+    image: nginx:latest
+    container_name: nginx-router
+    ports:
+      - "443:443"
+      - "80:80"
+    networks:
+      - http-network
+    depends_on:
+      - php-wiki
+      - php-wp
+    volumes:
+      - ./nginx-router/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx-router/www.dublin2019.com.cert.pem:/etc/nginx/ssl/www.dublin2019.com.cert.pem:ro
+      - ./nginx-router/www.dublin2019.com.key.pem:/etc/nginx/ssl/www.dublin2019.com.key.pem:ro
+
+  php-wiki:
+    build: ./php-wiki
+    container_name: php-wiki
+    networks:
+      - http-network
+      - wiki-network
+    expose:
+      - "80"
+    depends_on:
+      - mysql-wiki
+    volumes:
+      - wiki-html-volume:/var/www
+      - ./php-wiki/wiki-vhost.conf:/etc/apache2/sites-available/000-default.conf:ro
+
+  php-wp:
+    build: ./php-wp
+    container_name: php-wp
+    networks:
+      - http-network
+      - wp-network
+    expose:
+      - "80"
+    depends_on:
+      - mysql-wp
+    volumes:
+      - wp-html-volume:/var/www/html
+      - ./php-wp/wp-vhost.conf:/etc/apache2/sites-available/000-default.conf:ro
+
+  mysql-wiki:
+    image: mysql/mysql-server:5.7
+    container_name: mysql-wiki
+    networks:
+      - wiki-network
+    expose:
+      - "3306"
+    volumes:
+      - wiki-mysql-volume:/var/lib/mysql
+      - ./mysql-wiki/my.cnf:/etc/my.cnf:ro
+    environment:
+      MYSQL_DATABASE: {{ mysql_wiki_dbname }}
+      MYSQL_USER: {{ mysql_wiki_dbuser }}
+      MYSQL_PASSWORD: {{ mysql_wiki_dbpass }}
+
+  mysql-wp:
+    image: mysql/mysql-server:5.7
+    container_name: mysql-wp
+    networks:
+      - wp-network
+    expose:
+      - "3306"
+    volumes:
+      - wp-mysql-volume:/var/lib/mysql
+      - ./mysql-wp/my.cnf:/etc/my.cnf:ro
+    environment:
+      MYSQL_DATABASE: {{ mysql_wp_dbname }}
+      MYSQL_USER: {{ mysql_wp_user }}
+      MYSQL_PASSWORD: {{ mysql_wp_dnpass }}
+
